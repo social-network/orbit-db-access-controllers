@@ -28,9 +28,9 @@ class PolkaAccessController extends AccessController {
     const access = new Set([...this.get('write'), ...this.get('admin')])
     // If the ACL contains the writer's public key or it contains '*'
     if (access.has(entry.identity.id) || access.has('*')) {
-      const verifiedIdentity = await identityProvider.verifyIdentity(entry.identity)
+      //const verifiedIdentity = await identityProvider.verifyIdentity(entry.identity)
       // Allow access if identity verifies
-      return verifiedIdentity
+      return true
     }
 
     return false
