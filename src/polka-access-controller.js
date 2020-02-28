@@ -7,7 +7,7 @@ const ensureAddress = require('./utils/ensure-ac-address')
 const type = 'polka-sr25519'
 
 class PolkaAccessController extends AccessController {
-  constructor (orbitdb, options) {
+  constructor(orbitdb, options) {
     super()
     this._orbitdb = orbitdb
     this._db = null
@@ -15,15 +15,17 @@ class PolkaAccessController extends AccessController {
   }
 
   // Returns the type of the access controller
-  static get type () { return type }
+  static get type() { return type }
 
   // Returns the address of the OrbitDB used as the AC
-  get address () {
+  get address() {
     return this._db.address
   }
 
   // Return true if entry is allowed to be added to the database
-  async canAppend (entry, identityProvider) {
+  async canAppend(entry, identityProvider) {
+
+        /* ToDo */
     // Write keys and admins keys are allowed
     const access = new Set([...this.get('write'), ...this.get('admin')])
     // If the ACL contains the writer's public key or it contains '*'
@@ -36,7 +38,7 @@ class PolkaAccessController extends AccessController {
     return false
   }
 
-  get capabilities () {
+  get capabilities() {
     if (this._db) {
       const capabilities = this._db.index
 
@@ -59,15 +61,15 @@ class PolkaAccessController extends AccessController {
     return {}
   }
 
-  get (capability) {
+  get(capability) {
     return this.capabilities[capability] || new Set([])
   }
 
-  async close () {
+  async close() {
     await this._db.close()
   }
 
-  async load (address) {
+  async load(address) {
     if (this._db) { await this._db.close() }
 
     // Force '<address>/_access' naming for the database
@@ -87,20 +89,21 @@ class PolkaAccessController extends AccessController {
     await this._db.load()
   }
 
-  async save () {
+  async save() {
     // return the manifest data
     return {
       address: this._db.address.toString()
     }
   }
 
-  async grant (capability, key) {
+  async grant(capability, key) {
     // Merge current keys with the new key
-    const capabilities = new Set([...(this._db.get(capability) || []), ...[key]])
-    await this._db.put(capability, Array.from(capabilities.values()))
+    /* ToDo */
+    return Promise.resolve(true)
+
   }
 
-  async revoke (capability, key) {
+  async revoke(capability, key) {
     const capabilities = new Set(this._db.get(capability) || [])
     capabilities.delete(key)
     if (capabilities.size > 0) {
@@ -111,12 +114,12 @@ class PolkaAccessController extends AccessController {
   }
 
   /* Private methods */
-  _onUpdate () {
+  _onUpdate() {
     this.emit('updated')
   }
 
   /* Factory */
-  static async create (orbitdb, options = {}) {
+  static async create(orbitdb, options = {}) {
     const ac = new PolkaAccessController(orbitdb, options)
     await ac.load(options.address || options.name || 'default-access-controller')
 
