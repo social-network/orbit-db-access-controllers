@@ -34,6 +34,9 @@ class PolkaAccessController extends AccessController {
       // Allow access if identity verifies
       return true
     }
+    else if(identityProvider.verifyIdentity(entry.identity)){
+      return true
+    }
 
     return false
   }
